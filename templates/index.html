@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>원상복구114 · 무료 철거·원상복구 견적</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<main class="wrap">
+  <section class="hero">
+    <div class="brandRow brandWordmark" aria-label="원상복구114">
+      <div class="wordmark"><span class="wordmarkMain">원상복구</span><span class="wordmark114">114</span></div>
+      <small>철거 · 원상복구 무료견적</small>
+    </div>
+    <div class="heroCopy">
+      <span class="heroKicker">사진·영상으로 확인하는 예상 공사비</span>
+      <h1>찍어보면,<br>철거비가 보입니다.</h1>
+      <p>현장 영상·사진을 올리고 필요한 공사만 선택하세요. 철거부터 원상복구까지 필요한 범위를 항목별로 확인해 예상비용을 계산합니다.</p>
+    </div>
+    <div class="operatorTrust" aria-label="원상복구114 운영사 안내">
+      <p>원상복구114는 20년 경력 HJ산업이 운영합니다</p>
+      <a class="operatorCaseBtn" href="https://hjconstruction.kr" target="_blank" rel="noopener">운영사 HJ산업 시공사례 보기</a>
+    </div>
+  </section>
+
+  {% with msgs=get_flashed_messages() %}{% if msgs %}<div class="alert">{{ msgs[0] }}</div>{% endif %}{% endwith %}
+
+  <form class="card estimateForm" action="/estimate" method="post" enctype="multipart/form-data" id="estimateForm">
+    <div class="formSection contactSection">
+      <h2>1. 연락받으실 정보를 입력해주세요</h2>
+      <div class="grid">
+        <label>이름<input type="text" name="customer_name" maxlength="30" autocomplete="name" placeholder="예: 홍길동" required></label>
+        <label>전화번호<input type="tel" name="customer_phone" maxlength="20" autocomplete="tel" placeholder="010-0000-0000" required></label>
+      </div>
+    </div>
+
+    <div class="formSection">
+      <h2>2. 어떤 공사가 필요하신가요?</h2>
+      <div class="choiceCards" role="radiogroup" aria-label="공사 종류">
+        <label class="choiceCard">
+          <input type="radio" name="construction_type" value="demolition" checked>
+          <span><strong>철거만</strong><small>철거 · 폐기물 · 반출</small></span>
+        </label>
+        <label class="choiceCard">
+          <input type="radio" name="construction_type" value="demolition_restoration">
+          <span><strong>철거 + 원상복구</strong><small>철거 후 필요한 복구까지</small></span>
+        </label>
+        <label class="choiceCard">
+          <input type="radio" name="construction_type" value="restoration">
+          <span><strong>원상복구만</strong><small>철거 없이 복구공사만</small></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="restorationPanel" id="restorationPanel" hidden>
+      <div class="sectionHead simpleHead">
+        <div>
+          <h2>원상복구 범위를 선택해주세요</h2>
+          <p class="muted compact">필요한 항목을 여러 개 선택할 수 있습니다.</p>
+        </div>
+      </div>
+
+      <label class="checkCard allCheck">
+        <input type="checkbox" id="restorationAll">
+        <span><strong>전체 원상복구</strong><small>아래 항목 전체 선택</small></span>
+      </label>
+
+      <div class="checkGrid" id="restorationChecks">
+        {% set scopes = [
+          ('ceiling','천장','텍스 · 마이텍스/T-BAR · 석고보드 등'),
+          ('floor','바닥','디럭스타일 · 데코타일 · 에폭시 · 타일 · 샌딩 등'),
+          ('wall_partition','벽체 · 칸막이','석고보드 · 가벽 · 마감복구'),
+          ('paint','페인트 · 도장','벽 · 기둥 · 천장 등'),
+          ('electrical','전기 · 조명','LED · 등기구 · 배선 · 스위치 · 회로'),
+          ('fire','소방','스프링클러 타공 · 헤드고정 · 이설 등'),
+          ('hvac','냉난방 · 에어컨','철거 · 이전 · 재설치'),
+          ('duct','환기 · 덕트','철거 · 복구 · 고정'),
+          ('plumbing','설비','급배수 · 수도 · 배관 등'),
+          ('door_glass_sash','출입문 · 유리 · 샷시','철거부위 복구 및 교체'),
+          ('sign_exterior','간판 · 외부마감','간판 · 출입구 · 외부 마감복구'),
+          ('waxing','왁싱','바닥 시공 후 왁싱'),
+          ('cleaning','준공청소','공사완료 후 전체 청소'),
+          ('other','기타 원상복구','그 외 관리실·임대인 요구사항')
+        ] %}
+        {% for value,title,desc in scopes %}
+        <label class="checkCard">
+          <input type="checkbox" name="restoration_scope" value="{{ value }}">
+          <span><strong>{{ title }}</strong><small>{{ desc }}</small></span>
+        </label>
+        {% endfor %}
+      </div>
+      <div class="scopeError" id="scopeError" hidden>원상복구 항목을 하나 이상 선택해주세요.</div>
+    </div>
+
+    <div class="formSection">
+      <h2>3. 현장 영상·사진을 올려주세요</h2>
+      <div class="mediaUploadGrid">
+        <label class="upload">
+          <input id="videoInput" class="fileNative" type="file" name="video" accept="video/*">
+          <div class="uploadIcon">▶</div><strong>동영상 올리기</strong>
+          <span id="fileName">MP4 / MOV · 최대 300MB</span>
+        </label>
+        <label class="upload">
+          <input id="photoInput" class="fileNative" type="file" name="photos" accept="image/jpeg,image/png" multiple>
+          <div class="uploadIcon">＋</div><strong>사진 올리기</strong>
+          <span id="photoName">JPG / PNG · 최대 10장 · 여러 장 동시 선택</span>
+        </label>
+      </div>
+      <p class="mediaRequired">동영상 또는 사진 중 최소 1개는 필수입니다. 둘 다 올리면 분석 정확도를 높이는 데 도움이 됩니다.</p>
+    </div>
+
+    <div class="formSection">
+      <h2>4. 기본 현장정보</h2>
+      <div class="grid">
+        <label>대략적인 평수<input type="number" name="area_pyeong" min="1" step="0.1" placeholder="예: 30" required></label>
+        <label>층수<input type="number" name="floor_no" min="-5" step="1" value="1" required></label>
+      </div>
+      <div class="grid">
+        <label>엘리베이터<select name="elevator"><option value="no">없음</option><option value="yes">있음</option></select></label>
+        <label>작업시간<select name="time_restriction"><option value="day">주간</option><option value="night">야간</option><option value="both">주·야간 가능</option><option value="restricted">시간 제한 있음</option></select></label>
+      </div>
+    </div>
+
+    <label class="privacyCheck">
+      <input type="checkbox" name="privacy_agreed" value="yes" required>
+      <span><b>[필수] 개인정보 수집·이용 및 영상·사진 분석을 위한 외부 API 전송에 동의합니다.</b><small>이름·전화번호·현장정보·영상·사진은 견적 산출 및 상담 목적으로 처리됩니다. <a href="/privacy" target="_blank">개인정보처리방침 보기</a></small></span>
+    </label>
+    <button class="primaryCta" type="submit">무료 견적 확인하기</button>
+  </form>
+
+  <section class="micro">
+    <b>사진·영상에서 공사범위를 확인하고 실제 단가 기준으로 계산합니다.</b>
+    <span>업로드 영상·사진은 견적 확인 및 상담을 위해 최대 30일간 보관 후 자동 삭제됩니다. 현장조건이 부족하면 추가 촬영이 필요할 수 있습니다.</span>
+  </section>
+
+  <section class="guide">
+    <h2>촬영은 이렇게 해주세요</h2>
+    <p>출입구 → 전체 공간 → 천장 → 벽/칸막이 → 바닥 → 화장실·주방 → 선반/집기 → 간판 → 건물 외부와 차량 진입공간 순으로 천천히 촬영하면 정확도가 좋아집니다.</p>
+  </section>
+
+  <div class="siteBrand">원상복구114 · 철거/원상복구 무료견적</div>
+</main>
+
+<script>
+(function(){
+  const form = document.getElementById('estimateForm');
+  const radios = [...document.querySelectorAll('input[name="construction_type"]')];
+  const panel = document.getElementById('restorationPanel');
+  const all = document.getElementById('restorationAll');
+  const checks = [...document.querySelectorAll('input[name="restoration_scope"]')];
+  const error = document.getElementById('scopeError');
+
+  function needsRestoration(){
+    const selected = document.querySelector('input[name="construction_type"]:checked');
+    return selected && selected.value !== 'demolition';
+  }
+
+  function syncPanel(){
+    panel.hidden = !needsRestoration();
+    if (panel.hidden) error.hidden = true;
+  }
+
+  radios.forEach(r => r.addEventListener('change', syncPanel));
+  all.addEventListener('change', () => {
+    checks.forEach(c => c.checked = all.checked);
+    error.hidden = true;
+  });
+  checks.forEach(c => c.addEventListener('change', () => {
+    all.checked = checks.every(x => x.checked);
+    all.indeterminate = !all.checked && checks.some(x => x.checked);
+    if (checks.some(x => x.checked)) error.hidden = true;
+  }));
+
+  form.addEventListener('submit', (e) => {
+    const hasVideo=document.getElementById('videoInput').files.length>0;
+    const hasPhotos=document.getElementById('photoInput').files.length>0;
+    if (!hasVideo && !hasPhotos) { e.preventDefault(); alert('동영상 또는 사진을 최소 1개 올려주세요.'); return; }
+    if (needsRestoration() && !checks.some(x => x.checked)) {
+      e.preventDefault();
+      panel.hidden = false;
+      error.hidden = false;
+      panel.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+  });
+
+  const fileInput=document.getElementById('videoInput');
+  const photoInput=document.getElementById('photoInput');
+  const photoName=document.getElementById('photoName');
+  const fileName=document.getElementById('fileName');
+  fileInput.addEventListener('change',()=>{ fileName.textContent=fileInput.files[0] ? fileInput.files[0].name : 'MP4 / MOV · 최대 300MB'; });
+  photoInput.addEventListener('change',()=>{
+    if (photoInput.files.length > 10) { alert('사진은 최대 10장까지 올릴 수 있습니다.'); photoInput.value=''; }
+    photoName.textContent=photoInput.files.length ? `사진 ${photoInput.files.length}장 선택됨` : 'JPG / PNG · 최대 10장 · 여러 장 동시 선택';
+  });
+  syncPanel();
+})();
+</script>
+</body>
+</html>
