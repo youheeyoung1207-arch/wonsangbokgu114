@@ -1,0 +1,166 @@
+{
+  "labor": {
+    "korean_skilled_day": 250000,
+    "korean_helper_day": 220000,
+    "foreign_worker_day": 190000,
+    "meal_drink_per_person_day": 20000
+  },
+  "waste": {
+    "wood_2_5t_load": 300000,
+    "mixed_2_5t_load": 650000,
+    "concrete_tile_2_5t_load": 350000,
+    "ceiling_tex_pyeong_per_mixed_load": 100,
+    "ceiling_gypsum_pyeong_per_load": 60,
+    "mixed_m3_per_load_low": 12,
+    "mixed_m3_per_load_high": 15,
+    "concrete_tile_m3_per_load": 6
+  },
+  "equipment": {
+    "ladder_1h": 150000,
+    "ladder_half_day": 400000,
+    "ladder_full_day": 600000,
+    "sky_1h": 250000,
+    "sky_half_day": 400000,
+    "sky_full_day": 600000,
+    "mini_excavator_half_day": 450000,
+    "mini_excavator_full_day_general": 700000,
+    "mini_excavator_full_day_breaker": 750000
+  },
+  "flooring_per_pyeong": {
+    "deco_deluxe_1p_low": 22000,
+    "deco_deluxe_1p_high": 25000,
+    "carpet_tile": 35000,
+    "wood_floor": 25000,
+    "epoxy_1mm": 30000,
+    "epoxy_3mm": 50000,
+    "polished_tile": 70000
+  },
+  "gypsum_defaults": {
+    "board_width_mm": 900,
+    "board_height_mm": 1800,
+    "general_thickness_mm": 9.5,
+    "general_probability": 0.8,
+    "partition_default_sides": 2,
+    "partition_default_layers_per_side": 2,
+    "typical_partition_height_mm_low": 2800,
+    "typical_partition_height_mm_high": 3200
+  },
+  "productivity": {
+    "ceiling_tex_100_pyeong_people": 4,
+    "ceiling_tex_100_pyeong_days": 1,
+    "ceiling_tex_strip_hours": 2,
+    "partition_100_pyeong_man_days": 8
+  },
+  "rules": {
+    "signage_default_requires_sky": true,
+    "signage_typical_sky_hours": 1,
+    "large_exterior_metal_may_require_sky_days": [
+      1,
+      2
+    ],
+    "do_not_assume_days_from_floor_area_only": true,
+    "night_premium_fixed": null
+  },
+  "restoration": {
+    "ceiling": {
+      "tex_install_per_pyeong": 85000,
+      "mytone_install_per_pyeong": 95000,
+      "unknown_ceiling_provisional_per_pyeong": 85000,
+      "status": "mixed_confirmed_and_provisional",
+      "note": "석고텍스 85,000원/평·마이톤 95,000원/평은 사용자가 이전 대화에서 직접 전달한 단가. 천장 종류 미확정 시 85,000원/평 적용은 external_provisional.",
+      "source_tex": "user_confirmed_prior_session",
+      "source_mytone": "user_confirmed_prior_session",
+      "source_unknown": "derived_provisional_from_tex_rate"
+    },
+    "floor": {
+      "deluxe_tile_install_per_pyeong": 35000,
+      "status": "external_provisional",
+      "note": "자재+시공 외부조사 가견적. 실제 자재 규격 확인 후 조정."
+    },
+    "paint": {
+      "per_floor_pyeong_low": 25000,
+      "per_floor_pyeong_high": 30000,
+      "status": "external_provisional",
+      "note": "벽·기둥 일반 수성 2회 기준 외부조사 가견적."
+    },
+    "electrical": {
+      "fixture_count_ratio": 0.5,
+      "led_slim_each": 25000,
+      "status": "confirmed_material_only",
+      "note": "등수=평수×50% 휴리스틱과 LED 25,000원/개는 사용자가 이전 대화에서 직접 전달. 배선/회로 인건비는 현장별 추가.",
+      "source_fixture_count_ratio": "user_confirmed_prior_session",
+      "source_led_slim_each": "user_confirmed_prior_session"
+    },
+    "fire": {
+      "head_count_ratio": 0.5,
+      "sprinkler_fix_each": 30000,
+      "status": "confirmed",
+      "note": "헤드수=평수×50% 휴리스틱과 텍스 타공·헤드고정 30,000원/개는 사용자가 이전 대화에서 직접 전달.",
+      "source_head_count_ratio": "user_confirmed_prior_session",
+      "source_sprinkler_fix_each": "user_confirmed_prior_session"
+    },
+    "hvac": {
+      "unit_relocation_each": 250000,
+      "status": "external_provisional",
+      "note": "수량 미확정 시 1대 임시 가견적."
+    },
+    "duct": {
+      "fix_each": 120000,
+      "default_count": 1,
+      "status": "external_provisional",
+      "note": "덕트 규격/수량 확인 전 최소 1개소 임시 가견적."
+    },
+    "plumbing": {
+      "allowance_per_pyeong": 10000,
+      "status": "external_provisional",
+      "note": "급배수 범위 미확정 시 임시 가견적."
+    },
+    "door_glass_sash": {
+      "allowance_each": 300000,
+      "default_count": 1,
+      "status": "external_provisional",
+      "note": "규격/재질 확인 전 1개소 임시 가견적."
+    },
+    "sign_exterior": {
+      "allowance": 300000,
+      "status": "external_provisional",
+      "note": "간판/외부마감 범위 확인 전 임시 가견적."
+    },
+    "waxing": {
+      "per_pyeong": 8500,
+      "status": "external_provisional",
+      "note": "상업공간 왁싱 외부조사 가견적."
+    },
+    "cleaning": {
+      "per_pyeong": 15000,
+      "status": "external_provisional",
+      "note": "상업공간 준공청소 외부조사 가견적."
+    },
+    "wall_partition": {
+      "allowance_per_pyeong": 15000,
+      "status": "external_provisional",
+      "note": "철거 후 벽체/칸막이 보수 범위 미확정 시 바닥면적 기준 임시 가견적."
+    },
+    "other": {
+      "allowance": 0,
+      "status": "manual_review",
+      "note": "기타는 내용 확인 후 산정."
+    }
+  },
+  "demolition_provisional": {
+    "porcelain_tile_per_pyeong_low": 45000,
+    "porcelain_tile_per_pyeong_high": 65000,
+    "vinyl_sheet_per_pyeong_low": 10000,
+    "vinyl_sheet_per_pyeong_high": 18000,
+    "gypsum_ceiling_labor_per_pyeong_low": 12000,
+    "gypsum_ceiling_labor_per_pyeong_high": 20000,
+    "wood_frame_ceiling_per_pyeong_low": 25000,
+    "wood_frame_ceiling_per_pyeong_high": 40000,
+    "alc_wall_per_m2_low": 25000,
+    "alc_wall_per_m2_high": 45000,
+    "masonry_wall_per_m2_low": 30000,
+    "masonry_wall_per_m2_high": 55000,
+    "status": "external_provisional",
+    "note": "서비스 오픈 전 실적 검증 필요. 사용자 확정 단가와 분리 저장."
+  }
+}
