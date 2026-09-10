@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>원상복구114 │ 무료 AI 예상견적</title>
+    <meta name="description" content="사진이나 영상만 올리면 철거·원상복구 예상 견적을 무료로 확인할 수 있습니다.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="site-header">
+    <div class="container header-inner">
+        <a href="/" class="brand">
+            <span class="brand-mark">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 3L4 8V20H20V8L12 3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                    <path d="M9 13H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </span>
+            <div class="brand-text">
+                <strong>원상복구114</strong>
+                <span>무료 AI 예상견적 서비스</span>
+            </div>
+        </a>
+        <a href="https://hjconstruction.kr" target="_blank" rel="noopener" class="case-btn">운영사 HJ산업 시공사례 보기</a>
+    </div>
+</header>
+
+<main>
+{% with msgs=get_flashed_messages() %}{% if msgs %}<div class="alert">{{ msgs[0] }}</div>{% endif %}{% endwith %}
+<section class="hero">
+<div class="hero-left">
+<div class="hero-image">
+<div class="hero-overlay"></div>
+<div class="hero-content">
+<span class="hero-badge">무료 AI 예상견적</span>
+<h1>찍어보면,<br>철거비가 보입니다.</h1>
+<p>사진이나 영상을 올리면 AI가 공사 범위와 작업량을 분석하여 예상 견적을 무료로 계산해드립니다.</p>
+<div class="hero-company">
+    <strong>원상복구114는 20년 경력 HJ산업이 운영합니다.</strong>
+    <a href="https://hjconstruction.kr" target="_blank" rel="noopener" class="case-btn secondary">운영사 HJ산업 시공사례 보기</a>
+</div>
+<div class="hero-features">
+    <div class="feature">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 6H9L11 8H20V18H4V6Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="15" cy="13" r="2" stroke="currentColor" stroke-width="2"/></svg>
+        <span>사진 · 영상으로<br>간편하게</span>
+    </div>
+    <div class="feature">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M13 2L5 14H11L10 22L19 9H13L13 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        <span>무료로<br>바로 확인</span>
+    </div>
+    <div class="feature">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 20H21" stroke="currentColor" stroke-width="2"/><path d="M6 20V10L12 5L18 10V20" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        <span>필요한 공사만<br>선택</span>
+    </div>
+</div>
+</div>
+</div>
+</div>
+
+<form id="estimateForm" class="estimate-card estimateForm" action="/estimate" method="post" enctype="multipart/form-data">
+    <h2>무료 견적 신청</h2>
+    <p class="card-desc">사진이나 영상을 올리시면 AI가 예상 견적을 계산해드립니다.</p>
+
+    <div class="form-section">
+        <h3>1. 연락받으실 정보</h3>
+        <div class="field">
+            <label for="customerName">이름</label>
+            <input id="customerName" type="text" name="customer_name" maxlength="30" placeholder="이름을 입력해주세요" autocomplete="name" required>
+        </div>
+        <div class="field">
+            <label for="customerPhone">연락처</label>
+            <input id="customerPhone" type="tel" name="customer_phone" maxlength="20" placeholder="010-0000-0000" autocomplete="tel" required>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h3>2. 공사 종류</h3>
+        <label class="type-card">
+            <input type="radio" name="construction_type" value="demolition" required>
+            <span class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 20H20" stroke="currentColor" stroke-width="2"/><path d="M8 20V9L12 4L16 9V20" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></span>
+            <span class="card-text"><strong>철거만</strong><small>내부 철거 공사</small></span>
+        </label>
+        <label class="type-card">
+            <input type="radio" name="construction_type" value="demolition_restoration">
+            <span class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 11L12 4L21 11" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M6 10V20H18V10" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></span>
+            <span class="card-text"><strong>철거 + 원상복구</strong><small>철거 후 원상복구까지</small></span>
+        </label>
+        <label class="type-card">
+            <input type="radio" name="construction_type" value="restoration">
+            <span class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 20V8L12 3L19 8V20" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 13H15" stroke="currentColor" stroke-width="2"/></svg></span>
+            <span class="card-text"><strong>원상복구만</strong><small>기존 시설 복구 공사</small></span>
+        </label>
+    </div>
+
+    <div id="restorationPanel" class="restoration-panel" hidden>
+        <div class="panel-header">
+            <h3>3. 원상복구 항목 선택</h3>
+            <label class="all-check"><input type="checkbox" id="restorationAll"><span>전체 선택</span></label>
+        </div>
+        <p class="panel-desc">필요한 항목을 여러 개 선택할 수 있습니다.</p>
+        <div class="scope-grid">
+            {% set scopes = [
+              ('ceiling','천장'),('floor','바닥'),('wall_partition','벽체 · 칸막이'),('paint','페인트 · 도장'),
+              ('electrical','전기 · 조명'),('fire','소방'),('hvac','냉난방 · 에어컨'),('duct','환기 · 덕트'),
+              ('plumbing','설비'),('door_glass_sash','출입문 · 유리 · 샷시'),('sign_exterior','간판 · 외부마감'),
+              ('waxing','왁싱'),('cleaning','준공청소'),('other','기타 원상복구')
+            ] %}
+            {% for value,title in scopes %}
+            <label class="scope-item"><input type="checkbox" name="restoration_scope" value="{{ value }}"><span>{{ title }}</span></label>
+            {% endfor %}
+        </div>
+        <div id="scopeError" class="scope-error" hidden>원상복구 항목을 하나 이상 선택해주세요.</div>
+    </div>
+
+    <div class="form-section">
+        <h3>4. 사진 · 영상 업로드</h3>
+        <div class="upload-grid">
+            <label class="upload-card">
+                <input type="file" name="video" id="videoInput" accept="video/*" hidden>
+                <span class="upload-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7-11-7z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></span>
+                <strong>동영상 업로드</strong>
+                <small>MP4 · MOV</small>
+                <div id="fileName" class="file-name">선택된 파일 없음</div>
+            </label>
+            <label class="upload-card">
+                <input type="file" name="photos" id="photoInput" accept="image/jpeg,image/png" multiple hidden>
+                <span class="upload-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="2"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="2"/></svg></span>
+                <strong>사진 업로드</strong>
+                <small>여러 장 선택 가능</small>
+                <div id="photoName" class="file-name">선택된 사진 없음</div>
+            </label>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h3>5. 현장 기본정보 <small>(선택사항)</small></h3>
+        <div class="grid two">
+            <label>평수<input type="number" name="area_pyeong" placeholder="예 : 35"></label>
+            <label>층수<input type="text" name="floor_no" placeholder="예 : 3층"></label>
+        </div>
+        <div class="grid two">
+            <label>엘리베이터
+                <select name="elevator"><option value="">선택</option><option value="yes">있음</option><option value="no">없음</option></select>
+            </label>
+            <label>작업시간
+                <select name="time_restriction"><option value="">선택</option><option value="day">주간</option><option value="night">야간</option><option value="both">주·야간 가능</option><option value="restricted">시간 제한 있음</option></select>
+            </label>
+        </div>
+        <label>작업 희망 시기
+            <select name="preferred_timing"><option value="">선택</option><option value="immediately">즉시</option><option value="within_1_month">1개월 이내</option><option value="within_3_months">2~3개월</option><option value="undecided">미정</option></select>
+        </label>
+    </div>
+
+    <div class="privacy-box">
+        <label><input type="checkbox" name="privacy_agreed" value="yes" required> 개인정보 수집 및 이용에 동의합니다.</label>
+        <p>입력하신 정보는 견적 안내 목적 외에는 사용되지 않습니다.</p>
+    </div>
+
+    <button type="submit" class="estimate-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 5H20V19H4V5Z" stroke="currentColor" stroke-width="2"/><path d="M8 9H16" stroke="currentColor" stroke-width="2"/><path d="M8 13H14" stroke="currentColor" stroke-width="2"/></svg>
+        무료 견적 확인하기
+    </button>
+</form>
+</section>
+
+<section class="how-it-works">
+    <div class="container">
+        <div class="section-title">
+            <span class="section-badge">HOW IT WORKS</span>
+            <h2>3단계로,<br>간단하게 예상 견적을 확인하세요.</h2>
+            <p>복잡한 상담 없이 사진이나 영상을 올리면 AI가 예상 공사비를 계산합니다.</p>
+        </div>
+        <div class="steps">
+            <div class="step-card">
+                <div class="step-number">01</div>
+                <div class="step-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M4 6H9L11 8H20V18H4V6Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="15" cy="13" r="2" stroke="currentColor" stroke-width="2"/></svg></div>
+                <h3>현장 촬영하기</h3>
+                <p>철거 또는 원상복구가 필요한 공간을 사진 또는 영상으로 촬영합니다.</p>
+            </div>
+            <div class="step-arrow">→</div>
+            <div class="step-card">
+                <div class="step-number">02</div>
+                <div class="step-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 16V4" stroke="currentColor" stroke-width="2"/><path d="M8 8L12 4L16 8" stroke="currentColor" stroke-width="2"/><path d="M4 18H20" stroke="currentColor" stroke-width="2"/></svg></div>
+                <h3>사진 · 영상 업로드</h3>
+                <p>촬영한 사진과 영상을 업로드하고 간단한 정보만 입력합니다.</p>
+            </div>
+            <div class="step-arrow">→</div>
+            <div class="step-card">
+                <div class="step-number">03</div>
+                <div class="step-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 10H16" stroke="currentColor" stroke-width="2"/><path d="M8 14H14" stroke="currentColor" stroke-width="2"/></svg></div>
+                <h3>바로 예상 견적 확인</h3>
+                <p>AI가 공사 범위를 분석하여 예상 견적을 바로 계산합니다.</p>
+            </div>
+        </div>
+    </div>
+</section>
+</main>
+
+<footer class="site-footer">
+    <div class="container footer-inner">
+        <div class="footer-brand">
+            <div class="brand-mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3L4 8V20H20V8L12 3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div>
+            <div><strong>원상복구114</strong><p>AI 무료 철거 · 원상복구 예상견적</p></div>
+        </div>
+        <div class="footer-company">
+            <strong>운영사</strong>
+            <p>HJ산업</p>
+            <a href="https://hjconstruction.kr" target="_blank" rel="noopener">운영사 HJ산업 시공사례 보기</a>
+        </div>
+    </div>
+    <div class="footer-copy">© 2026 원상복구114. All Rights Reserved.</div>
+</footer>
+
+<script>
+(function(){
+  const form = document.getElementById('estimateForm');
+  const radios = [...document.querySelectorAll('input[name="construction_type"]')];
+  const panel = document.getElementById('restorationPanel');
+  const all = document.getElementById('restorationAll');
+  const checks = [...document.querySelectorAll('input[name="restoration_scope"]')];
+  const error = document.getElementById('scopeError');
+
+  function needsRestoration(){
+    const selected = document.querySelector('input[name="construction_type"]:checked');
+    return selected && selected.value !== 'demolition';
+  }
+
+  function syncPanel(){
+    panel.hidden = !needsRestoration();
+    if (panel.hidden) error.hidden = true;
+  }
+
+  radios.forEach(r => r.addEventListener('change', syncPanel));
+  all.addEventListener('change', () => {
+    checks.forEach(c => c.checked = all.checked);
+    error.hidden = true;
+  });
+  checks.forEach(c => c.addEventListener('change', () => {
+    all.checked = checks.every(x => x.checked);
+    all.indeterminate = !all.checked && checks.some(x => x.checked);
+    if (checks.some(x => x.checked)) error.hidden = true;
+  }));
+
+  form.addEventListener('submit', (e) => {
+    const hasVideo=document.getElementById('videoInput').files.length>0;
+    const hasPhotos=document.getElementById('photoInput').files.length>0;
+    if (!hasVideo && !hasPhotos) { e.preventDefault(); alert('동영상 또는 사진을 최소 1개 올려주세요.'); return; }
+    if (needsRestoration() && !checks.some(x => x.checked)) {
+      e.preventDefault();
+      panel.hidden = false;
+      error.hidden = false;
+      panel.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+  });
+
+  const fileInput=document.getElementById('videoInput');
+  const photoInput=document.getElementById('photoInput');
+  const photoName=document.getElementById('photoName');
+  const fileName=document.getElementById('fileName');
+  fileInput.addEventListener('change',()=>{ fileName.textContent=fileInput.files[0] ? fileInput.files[0].name : 'MP4 / MOV · 최대 300MB'; });
+  photoInput.addEventListener('change',()=>{
+    if (photoInput.files.length > 10) { alert('사진은 최대 10장까지 올릴 수 있습니다.'); photoInput.value=''; }
+    photoName.textContent=photoInput.files.length ? `사진 ${photoInput.files.length}장 선택됨` : 'JPG / PNG · 최대 10장 · 여러 장 동시 선택';
+  });
+  syncPanel();
+})();
+</script>
+</body>
+</html>
