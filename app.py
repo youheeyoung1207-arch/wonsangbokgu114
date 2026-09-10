@@ -7,7 +7,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 
-from db import init_db, load_rates, create_project, save_analysis, save_estimate, list_projects, get_project, purge_expired_videos
+from db import init_db, load_rates, create_project, save_analysis, save_estimate, list_projects, get_project, mark_follow_up_requested, purge_expired_videos
 from analyzer import analyze_media, MODEL_VERSION
 from estimator import estimate
 
@@ -25,6 +25,16 @@ VIDEO_RETENTION_DAYS=int(os.getenv('UPLOAD_RETENTION_DAYS','30'))
 CONTACT_PHONE=os.getenv('CONTACT_PHONE','01077472773')
 CONTACT_PHONE_TEL=re.sub(r'[^0-9+]', '', CONTACT_PHONE)
 
+# Visible build marker: helps distinguish the exact code running on Render.
+BUILD_VERSION=os.getenv('BUILD_VERSION','v2.7.0-follow-up-request')
+BUILD_TIME_KST=os.getenv('BUILD_TIME_KST','2026-09-09 23:20 KST')
+RENDER_GIT_COMMIT=(os.getenv('RENDER_GIT_COMMIT') or '').strip()
+BUILD_COMMIT=RENDER_GIT_COMMIT[:7] if RENDER_GIT_COMMIT else 'local'
+
+@app.context_processor
+def _build_marker():
+    return dict(build_version=BUILD_VERSION, build_time_kst=BUILD_TIME_KST, build_commit=BUILD_COMMIT)
+
 @app.before_request
 def _cleanup_expired_uploads():
     # V2 scale: lightweight lazy cleanup. Default policy = 30 days.
@@ -34,6 +44,14 @@ def _cleanup_expired_uploads():
         app.logger.exception('expired upload cleanup failed')
 
 
+
+def _format_phone(v):
+    digits=re.sub(r'[^0-9]', '', v or '')
+    if len(digits)==11:
+        return f'{digits[:3]}-{digits[3:7]}-{digits[7:]}'
+    if len(digits)==10:
+        return f'{digits[:3]}-{digits[3:6]}-{digits[6:]}'
+    return (v or '').strip()
 
 def _valid_phone(v):
     return bool(re.fullmatch(r"[0-9\-+ ]{9,20}", (v or '').strip()))
@@ -102,6 +120,15 @@ def admin_photo(project_id, photo_index):
     path=Path(photos[photo_index])
     if not path.exists(): abort(404)
     return send_file(path,conditional=True)
+
+
+@app.post('/request-follow-up/<int:project_id>')
+def request_follow_up(project_id):
+    row=get_project(project_id)
+    if not row:
+        abort(404)
+    requested_at=mark_follow_up_requested(project_id)
+    return {'ok': True, 'message': '요청이 접수되었습니다.', 'requested_at': requested_at}
 
 @app.get('/privacy')
 def privacy():
@@ -202,7 +229,7 @@ def make_estimate():
                     Path(raw).unlink(missing_ok=True)
                 except Exception:
                     app.logger.warning('temporary upload cleanup failed: %s', raw)
-    return render_template('result.html', result=result, analysis=analysis, project_id=project_id, context=context, recalculated=False, contact_phone=CONTACT_PHONE, contact_phone_tel=CONTACT_PHONE_TEL)
+    return render_template('result.html', result=result, analysis=analysis, project_id=project_id, context=context, recalculated=False, contact_phone=CONTACT_PHONE, contact_phone_tel=CONTACT_PHONE_TEL, customer_phone_display=_format_phone(customer_phone), follow_up_requested=False)
 
 
 def _bool_field(name: str) -> bool:
@@ -294,7 +321,8 @@ def recalculate():
             save_estimate(project_id, result)
         except Exception:
             app.logger.exception('recalculation save failed')
-    return render_template('result.html', result=result, analysis=analysis, project_id=project_id, context=context, recalculated=True, contact_phone=CONTACT_PHONE, contact_phone_tel=CONTACT_PHONE_TEL)
+    project_row=get_project(project_id) if project_id else None
+    return render_template('result.html', result=result, analysis=analysis, project_id=project_id, context=context, recalculated=True, contact_phone=CONTACT_PHONE, contact_phone_tel=CONTACT_PHONE_TEL, customer_phone_display=_format_phone(project_row['customer_phone'] if project_row else ''), follow_up_requested=bool(project_row and project_row['requested_at']))
 
 if __name__=='__main__':
     init_db()

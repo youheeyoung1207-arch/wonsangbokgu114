@@ -3,9 +3,15 @@
 <a class="back" href="/">← 다시 계산</a>
 <section class="resultHero"><div class="eyebrow">예상 철거비</div><h1>{{ '{:,}'.format(result.total_low) }}원 ~<br>{{ '{:,}'.format(result.total_high) }}원</h1><p>분석 신뢰도 {{ (result.confidence*100)|round|int }}% · {{ context.area_pyeong }}평 · {{ context.floor_no }}층</p><p class="estimateNotice">이 견적은 영상 분석을 기반으로 한 예상 범위입니다. 정확한 견적은 현장답사 후 확정됩니다.</p>{% if recalculated %}<p class="reviewedBadge">✓ 자동인식 결과 수정값으로 다시 계산했습니다.</p>{% endif %}</section>
 
+<section class="quoteRequestCta" id="quoteRequestCta">
+  <p class="quoteRequestPhone">{% if customer_phone_display %}<strong>{{ customer_phone_display }}</strong>로 연락드릴까요?{% else %}입력하신 연락처로 연락드릴까요?{% endif %}</p>
+  <button class="quoteRequestBtn" id="quoteRequestBtn" type="button" data-url="{{ url_for('request_follow_up', project_id=project_id) }}" {% if follow_up_requested %}disabled{% endif %}>{% if follow_up_requested %}요청 접수 완료{% else %}이 견적으로 요청하기{% endif %}</button>
+  <p class="quoteRequestMessage" id="quoteRequestMessage" {% if not follow_up_requested %}hidden{% endif %}>{% if follow_up_requested %}요청이 접수되었습니다.{% endif %}</p>
+</section>
+
 <section class="contactCta">
   <a class="callBtn" href="tel:{{ contact_phone_tel }}">지금 바로 전화 상담</a>
-  <small>입력하신 전화번호로 곧 연락드립니다</small>
+  <small>직접 상담을 원하시면 전화해주세요</small>
 </section>
 
 {% set ct=context.get('construction_type','demolition') %}
@@ -76,4 +82,30 @@
 {% if result.needs_more_video %}<section class="card warn"><h2>추가 확인이 필요합니다</h2>{% for t in result.needs_more_video %}<p>• {{ t }}</p>{% endfor %}</section>{% endif %}
 <details class="card debug"><summary>자동 인식 원본 상세 보기</summary><pre>{{ analysis | tojson(indent=2) }}</pre></details>
 <div class="siteBrand">원상복구114 · 철거/원상복구 무료견적</div>
-</main></body></html>
+</main>
+<script>
+(() => {
+  const btn=document.getElementById('quoteRequestBtn');
+  const msg=document.getElementById('quoteRequestMessage');
+  if(!btn || btn.disabled) return;
+  btn.addEventListener('click', async () => {
+    btn.disabled=true;
+    const original=btn.textContent;
+    btn.textContent='접수 중...';
+    try{
+      const res=await fetch(btn.dataset.url,{method:'POST',headers:{'Accept':'application/json'}});
+      if(!res.ok) throw new Error('request failed');
+      const data=await res.json();
+      btn.textContent='요청 접수 완료';
+      msg.textContent=data.message || '요청이 접수되었습니다.';
+      msg.hidden=false;
+    }catch(e){
+      btn.disabled=false;
+      btn.textContent=original;
+      msg.textContent='요청 접수 중 오류가 발생했습니다. 다시 눌러주세요.';
+      msg.hidden=false;
+    }
+  });
+})();
+</script>
+</body></html>

@@ -23,7 +23,8 @@ CREATE TABLE IF NOT EXISTS projects (
   time_restriction TEXT,
   video_path TEXT,
   photo_paths_json TEXT,
-  status TEXT NOT NULL DEFAULT 'uploaded'
+  status TEXT NOT NULL DEFAULT 'uploaded',
+  requested_at TEXT
 );
 CREATE TABLE IF NOT EXISTS analyses (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -60,7 +61,7 @@ CREATE TABLE IF NOT EXISTS feedback (
 PROJECT_MIGRATIONS={
  'customer_name':'TEXT','customer_phone':'TEXT','privacy_agreed':'INTEGER NOT NULL DEFAULT 0',
  'privacy_agreed_at':'TEXT','construction_type':'TEXT','restoration_scopes_json':'TEXT',
- 'photo_paths_json':'TEXT'
+ 'photo_paths_json':'TEXT','requested_at':'TEXT'
 }
 
 def _now(): return datetime.now(timezone.utc).isoformat()
@@ -114,6 +115,18 @@ def get_project(project_id):
     with connect() as conn:
         return conn.execute('SELECT * FROM projects WHERE id=?',(project_id,)).fetchone()
 
+
+
+def mark_follow_up_requested(project_id):
+    """Mark a quote as explicitly requested by the customer. Idempotent."""
+    with connect() as conn:
+        row=conn.execute('SELECT requested_at FROM projects WHERE id=?',(project_id,)).fetchone()
+        if not row:
+            return None
+        requested_at=row['requested_at'] or _now()
+        if not row['requested_at']:
+            conn.execute("UPDATE projects SET requested_at=?, status='requested' WHERE id=?",(requested_at,project_id))
+        return requested_at
 
 def purge_expired_videos(retention_days=30):
     """Delete expired video/photo files and clear stale DB paths. Returns deleted file count."""
